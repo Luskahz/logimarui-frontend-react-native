@@ -13,13 +13,7 @@ export default function LoginScreen() {
   const [senha, setSenha] = useState("");
   const [mode, setMode] = useState<"login" | "register">("login");
   const [nome, setNome] = useState("");
-  function handleSubmit() {
-    if (mode === "login") {
-      handleLogin();
-    } else {
-      handleRegister();
-    }
-  }
+
 
   function handleLogin() {
     if (!matricula || !senha) {
@@ -27,14 +21,6 @@ export default function LoginScreen() {
       return;
     }
 
-    router.replace("/(main)/home");
-  }
-
-  function handleRegister() {
-    if (!nome || !matricula || !senha) {
-      alert("Preencha todos os campos");
-      return;
-    }
     router.replace("/(main)/home");
   }
 
