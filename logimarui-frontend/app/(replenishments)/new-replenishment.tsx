@@ -128,7 +128,8 @@ function buildProdutos(codCliente: string, numeroNota: string): Produto[] {
   ];
 
   // “embaralha” um pouco só pra simular diferenças por nota
-  const shift = (parseInt(numeroNota.slice(0, 2), 10) + codCliente.length) % base.length;
+  const shift =
+    (parseInt(numeroNota.slice(0, 2), 10) + codCliente.length) % base.length;
   return [...base.slice(shift), ...base.slice(0, shift)];
 }
 
@@ -210,10 +211,7 @@ function SelectField({
 
       <Pressable
         onPress={handleOpen}
-        style={[
-          styles.selectBox,
-          disabled && styles.selectBoxDisabled,
-        ]}
+        style={[styles.selectBox, disabled && styles.selectBoxDisabled]}
       >
         <Text style={[styles.selectText, !value && styles.selectPlaceholder]}>
           {value || placeholder}
@@ -248,11 +246,15 @@ function SelectField({
               data={paginated}
               keyExtractor={(item) => item.key}
               onEndReached={() => {
-                if (paginated.length < filtered.length) setPage((p) => p + 1);
+                if (paginated.length < filtered.length)
+                  setPage((p) => p + 1);
               }}
               onEndReachedThreshold={0.6}
               renderItem={({ item }) => (
-                <Pressable style={styles.modalItem} onPress={() => handlePick(item)}>
+                <Pressable
+                  style={styles.modalItem}
+                  onPress={() => handlePick(item)}
+                >
                   <Text style={styles.modalItemText}>{item.label}</Text>
                 </Pressable>
               )}
@@ -303,6 +305,9 @@ export default function NewReplenishmentScreen() {
   // “Sessão” do motorista (mock)
   const motorista = MOCK_MOTORISTA;
 
+  // ✅ Modal de sucesso
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   // Seleções principais
   const [codMapa, setCodMapa] = useState(motorista.mapas[0]?.codMapa ?? "");
   const [codCliente, setCodCliente] = useState("");
@@ -350,16 +355,32 @@ export default function NewReplenishmentScreen() {
     [produtosAtual, codProduto]
   );
 
-  const unidadesDisponiveis = useMemo(() => produtoAtual?.unidades ?? [], [produtoAtual]);
+  const unidadesDisponiveis = useMemo(
+    () => produtoAtual?.unidades ?? [],
+    [produtoAtual]
+  );
 
   const maxQtdDaUnidade = useMemo(() => {
     const u = unidadesDisponiveis.find((x) => x.unidade === unidade);
     return u?.max ?? 0;
   }, [unidadesDisponiveis, unidade]);
 
+  // ✅ Reset centralizado (evita esquecer campo)
+  function resetForm() {
+    setLinhas([]);
+    setCodMapa(motorista.mapas[0]?.codMapa ?? "");
+    setCodCliente("");
+    setNota("");
+    setCodProduto("");
+    setUnidade("");
+    setQuantidade(null);
+    setMotivo("");
+    setFotoCanhoto(undefined);
+    setFotoAvaria(undefined);
+  }
+
   // Reset encadeado (mapa -> cliente -> nota -> produto...)
   useEffect(() => {
-    // quando muda mapa, zera tudo abaixo
     setCodCliente("");
     setNota("");
     setCodProduto("");
@@ -371,7 +392,6 @@ export default function NewReplenishmentScreen() {
   }, [codMapa]);
 
   useEffect(() => {
-    // quando muda cliente, zera nota e abaixo
     setNota("");
     setCodProduto("");
     setUnidade("");
@@ -382,7 +402,6 @@ export default function NewReplenishmentScreen() {
   }, [codCliente]);
 
   useEffect(() => {
-    // quando muda nota, zera produto e abaixo
     setCodProduto("");
     setUnidade("");
     setQuantidade(null);
@@ -392,7 +411,6 @@ export default function NewReplenishmentScreen() {
   }, [nota]);
 
   useEffect(() => {
-    // quando muda produto, zera unidade e quantidade
     setUnidade("");
     setQuantidade(null);
     setMotivo("");
@@ -401,7 +419,6 @@ export default function NewReplenishmentScreen() {
   }, [codProduto]);
 
   useEffect(() => {
-    // quando muda unidade, zera quantidade
     setQuantidade(null);
   }, [unidade]);
 
@@ -470,7 +487,6 @@ export default function NewReplenishmentScreen() {
   }
 
   function editarLinha(l: Linha) {
-    // remove a linha e sobe dados pro form
     setLinhas((prev) => prev.filter((x) => x.id !== l.id));
     setNota(l.nota);
     setCodProduto(l.codProduto);
@@ -488,33 +504,20 @@ export default function NewReplenishmentScreen() {
         text: "Sim, cancelar",
         style: "destructive",
         onPress: () => {
-          setLinhas([]);
-          // libera tudo
-          setCodCliente("");
-          setNota("");
-          setCodProduto("");
-          setUnidade("");
-          setQuantidade(null);
-          setMotivo("");
-          setFotoCanhoto(undefined);
-          setFotoAvaria(undefined);
+          resetForm();
         },
       },
     ]);
   }
 
+  // ✅ AQUI está o que você queria
   function finalizarReposicao() {
     if (!hasLinhas) return;
 
-    // aqui no futuro: POST /replenishment + lines
-    // por enquanto: só demonstra fluxo
-    Alert.alert(
-      "Reposição finalizada (mock)",
-      `Linhas: ${linhas.length}\nCliente: ${codCliente}\nMapa: ${codMapa}`
-    );
-
-    // depois você vai navegar pro ticket com payload
-    // router.push({ pathname: "/ticket", params: { ... } })
+    // futuro: POST /replenishment
+    // agora: reseta e mostra popup próprio
+    resetForm();
+    setShowSuccessModal(true);
   }
 
   const mapaOptions: Option[] = motorista.mapas.map((m) => ({
@@ -557,8 +560,6 @@ export default function NewReplenishmentScreen() {
     { key: "QUALIDADE", label: "QUALIDADE" },
   ];
 
-  const nomeCliente = clienteAtual?.nomeCliente ?? "";
-
   return (
     <View style={styles.screen}>
       {/* Header */}
@@ -572,7 +573,10 @@ export default function NewReplenishmentScreen() {
       </View>
 
       {/* Content */}
-      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 140 }}>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={{ paddingBottom: 140 }}
+      >
         {/* Motorista (fixo) */}
         <SelectField
           label="CÓDIGO MOTORISTA"
@@ -593,9 +597,7 @@ export default function NewReplenishmentScreen() {
           options={mapaOptions}
           onSelect={(opt) => setCodMapa(opt.key)}
           pageSize={10}
-          rightAddon={
-            lockMapaCliente ? <Text style={styles.lock}>🔒</Text> : null
-          }
+          rightAddon={lockMapaCliente ? <Text style={styles.lock}>🔒</Text> : null}
         />
 
         {/* Cliente + histórico */}
@@ -609,18 +611,12 @@ export default function NewReplenishmentScreen() {
               options={clienteOptions}
               onSelect={(opt) => setCodCliente(opt.key)}
               pageSize={10}
-              rightAddon={
-                lockMapaCliente ? <Text style={styles.lock}>🔒</Text> : null
-              }
+              rightAddon={lockMapaCliente ? <Text style={styles.lock}>🔒</Text> : null}
             />
           </View>
 
-          {/* bônus: histórico do cliente */}
           <Pressable
-            style={[
-              styles.bookBtn,
-              !codCliente && styles.bookBtnDisabled,
-            ]}
+            style={[styles.bookBtn, !codCliente && styles.bookBtnDisabled]}
             disabled={!codCliente}
             onPress={() =>
               router.push({
@@ -641,15 +637,13 @@ export default function NewReplenishmentScreen() {
           disabled={!codCliente}
           options={notaOptions}
           onSelect={(opt) => setNota(opt.key)}
-          pageSize={10} // paginação de 10
+          pageSize={10}
         />
 
         {/* Produto */}
         <SelectField
           label="PRODUTO"
-          value={
-            produtoOptions.find((o) => o.key === codProduto)?.label || ""
-          }
+          value={produtoOptions.find((o) => o.key === codProduto)?.label || ""}
           placeholder="SELECIONE O PRODUTO"
           disabled={!nota}
           options={produtoOptions}
@@ -695,20 +689,14 @@ export default function NewReplenishmentScreen() {
           <>
             <Text style={styles.sectionTitle}>FOTOS</Text>
 
-            <Pressable
-              style={styles.photoBox}
-              onPress={() => pickPhoto("canhoto")}
-            >
+            <Pressable style={styles.photoBox} onPress={() => pickPhoto("canhoto")}>
               <Text style={styles.photoLabel}>
                 {fotoCanhoto ? "✅ Canhoto anexado" : "📷 Foto do canhoto"}
               </Text>
             </Pressable>
 
             {(motivo === "AVARIA" || motivo === "QUALIDADE") && (
-              <Pressable
-                style={styles.photoBox}
-                onPress={() => pickPhoto("avaria")}
-              >
+              <Pressable style={styles.photoBox} onPress={() => pickPhoto("avaria")}>
                 <Text style={styles.photoLabel}>
                   {fotoAvaria ? "✅ Avaria anexada" : "📷 Foto da avaria"}
                 </Text>
@@ -726,9 +714,7 @@ export default function NewReplenishmentScreen() {
           linhas.map((l) => (
             <View key={l.id} style={styles.lineCard}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.lineTop}>
-                  Nota: {l.nota}
-                </Text>
+                <Text style={styles.lineTop}>Nota: {l.nota}</Text>
                 <Text style={styles.lineMid}>
                   {l.codProduto} - {l.nomeProduto}
                 </Text>
@@ -758,10 +744,7 @@ export default function NewReplenishmentScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.finishBtn,
-            !hasLinhas && styles.finishBtnDisabled,
-          ]}
+          style={[styles.finishBtn, !hasLinhas && styles.finishBtnDisabled]}
           disabled={!hasLinhas}
           onPress={finalizarReposicao}
         >
@@ -775,6 +758,29 @@ export default function NewReplenishmentScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* ✅ Popup de sucesso */}
+      <Modal visible={showSuccessModal} transparent animationType="fade">
+        <View style={styles.successOverlay}>
+          <View style={styles.successCard}>
+            <View style={styles.successHeader}>
+              <Text style={styles.successTitle}>Reposição lançada</Text>
+
+              <Pressable onPress={() => setShowSuccessModal(false)}>
+                <Text style={styles.successClose}>✕</Text>
+              </Pressable>
+            </View>
+
+            <Text style={styles.successText}>
+              A reposição foi registrada com sucesso.
+            </Text>
+
+            <TouchableOpacity style={styles.ticketBtn}>
+              <Text style={styles.ticketBtnText}>MOSTRAR TICKET</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -1029,7 +1035,7 @@ const styles = StyleSheet.create({
     color: "#777",
   },
 
-  // Modal
+  // Modal do Select
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.55)",
@@ -1091,5 +1097,51 @@ const styles = StyleSheet.create({
   modalCloseText: {
     color: "#ccc",
     fontWeight: "bold",
+  },
+
+  successOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  successCard: {
+    width: "100%",
+    backgroundColor: "#1f1f1f",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#333",
+    padding: 16,
+  },
+  successHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  successTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  successClose: {
+    color: "#777",
+    fontSize: 18,
+  },
+  successText: {
+    color: "#ccc",
+    fontSize: 14,
+    marginBottom: 20,
+  },
+  ticketBtn: {
+    backgroundColor: "#f4a100",
+    paddingVertical: 14,
+    borderRadius: 6,
+  },
+  ticketBtnText: {
+    color: "#000",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
