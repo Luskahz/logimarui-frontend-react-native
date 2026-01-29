@@ -11,41 +11,22 @@ import { router } from "expo-router";
 export default function LoginScreen() {
   const [matricula, setMatricula] = useState("");
   const [senha, setSenha] = useState("");
-  const [mode, setMode] = useState<"login" | "register">("login");
-  const [nome, setNome] = useState("");
-
 
   function handleLogin() {
     if (!matricula || !senha) {
       alert("Preencha matricula e senha");
       return;
     }
+    // aqui fica a logica do login de fato, onde eu faço o fetch na url da api
 
     router.replace("/(main)/home");
   }
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Logimarui - v1.0.0</Text>
-      </View>
-
-      {/* Conteúdo */}
-      <View style={styles.content}>
+      <View style={{flex: 1, justifyContent: "center"}}>
         <Text style={styles.title}>
-          {mode === "login" ? "ENTRAR" : "REGISTRO"}
+          BEM VINDO
         </Text>
-        {mode === "register" && (
-          <TextInput
-            placeholder="NOME COMPLETO"
-            placeholderTextColor="#999"
-            value={nome}
-            onChangeText={setNome}
-            style={styles.input}
-          />
-        )}
-
         <TextInput
           placeholder="INSIRA SUA MATRÍCULA"
           placeholderTextColor="#999"
@@ -66,37 +47,28 @@ export default function LoginScreen() {
         <View style={styles.actionsRow}>
           <Text
             style={styles.link}
-            onPress={() => alert("Fluxo de recuperação ainda não implementado")}
+            onPress={() => router.push("/(auth)/forgot-password")}
           >
-            Esqueci minha senha
+            Recuperar Senha
           </Text>
 
-          {mode === "login" ? (
-            <Text style={styles.link} onPress={() => setMode("register")}>
-              REGISTRAR
-            </Text>
-          ) : (
-            <Text style={styles.link} onPress={() => setMode("login")}>
-              ENTRAR
-            </Text>
-          )}
+          <Text style={styles.link} onPress={() => router.push("/(auth)/register")}>
+            Registrar
+          </Text>
+          
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>
-            {mode === "login" ? "ENTRAR" : "REGISTRAR"}
+            ENTRAR
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
   );
 
 }
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#1c1c1c",
-  },
+
 
   header: {
     paddingTop: 60,
@@ -107,12 +79,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     letterSpacing: 1,
-  },
-
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 20,
   },
   link: {
     color: "#aaa",
