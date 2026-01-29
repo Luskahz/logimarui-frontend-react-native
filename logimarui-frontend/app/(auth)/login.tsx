@@ -69,17 +69,6 @@ export default function LoginScreen() {
 }
 const styles = StyleSheet.create({
 
-
-  header: {
-    paddingTop: 60,
-    alignItems: "center",
-  },
-
-  headerText: {
-    color: "#fff",
-    fontSize: 14,
-    letterSpacing: 1,
-  },
   link: {
     color: "#aaa",
     fontSize: 12,
@@ -101,12 +90,6 @@ const styles = StyleSheet.create({
     padding: 25,
     marginBottom: 12,
     color: "#fff",
-  },
-
-  forgotPassword: {
-    color: "#aaa",
-    fontSize: 15,
-    marginBottom: 13,
   },
 
   button: {

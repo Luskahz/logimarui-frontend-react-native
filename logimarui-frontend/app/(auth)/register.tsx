@@ -54,7 +54,7 @@ export default function RegisterScreen() {
 
         <View style={styles.actionsRow}>
             <Text style={styles.link} onPress={() => router.push("/(auth)/login")}>
-              ENTRAR
+              Entrar
             </Text>
         </View>
 
@@ -68,20 +68,9 @@ export default function RegisterScreen() {
 
 }
 const styles = StyleSheet.create({
-
-  header: {
-    paddingTop: 60,
-    alignItems: "center",
-  },
-
-  headerText: {
-    color: "#fff",
-    fontSize: 14,
-    letterSpacing: 1,
-  },
   link: {
     color: "#aaa",
-    fontSize: 12
+    fontSize: 14
   },
 
   title: {
@@ -100,12 +89,6 @@ const styles = StyleSheet.create({
     padding: 25,
     marginBottom: 12,
     color: "#fff",
-  },
-
-  forgotPassword: {
-    color: "#aaa",
-    fontSize: 15,
-    marginBottom: 13,
   },
 
   button: {

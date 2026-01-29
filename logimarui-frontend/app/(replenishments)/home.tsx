@@ -59,7 +59,7 @@ export default function ReplenishmentsScreen() {
         style={styles.card}
         onPress={() =>
           router.push({
-            pathname: "/(main)/ticket",
+            pathname: "/ticket",
             params: {
               id: item.id,
             },

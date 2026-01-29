@@ -8,31 +8,12 @@ import {
 import { useState } from "react";
 import { router } from "expo-router";
 
-export default function LoginScreen() {
+export default function ForgotPAsswordScreen() {
   const [matricula, setMatricula] = useState("");
-  const [senha, setSenha] = useState("");
-  const [mode, setMode] = useState<"login" | "register">("login");
-  const [nome, setNome] = useState("");
-  function handleSubmit() {
-    if (mode === "login") {
-      handleLogin();
-    } else {
-      handleRegister();
-    }
-  }
 
-  function handleLogin() {
-    if (!matricula || !senha) {
-      alert("Preencha matricula e senha");
-      return;
-    }
-
-    router.replace("/(main)/home");
-  }
-
-  function handleRegister() {
-    if (!nome || !matricula || !senha) {
-      alert("Preencha todos os campos");
+  function handleForgotPassword() {
+    if (!matricula) {
+      alert("Preencha a matrícula");
       return;
     }
     router.replace("/(main)/home");
@@ -54,13 +35,13 @@ export default function LoginScreen() {
 
         <View style={styles.actionsRow}>
             <Text style={styles.link} onPress={() => router.push("/(auth)/login")}>
-              ENTRAR
+              Entrar
             </Text>
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <TouchableOpacity style={styles.button} onPress={handleForgotPassword}>
           <Text style={styles.buttonText}>
-            SOLICITAR TROCA DE SENHA
+            ENVIAR SOLICITAÇÃO
           </Text>
         </TouchableOpacity>
       </View>
@@ -69,24 +50,13 @@ export default function LoginScreen() {
 }
 const styles = StyleSheet.create({
  
-
-  header: {
-    paddingTop: 60,
-    alignItems: "center",
-  },
-
-  headerText: {
-    color: "#fff",
-    fontSize: 14,
-    letterSpacing: 1,
-  },
   link: {
     color: "#aaa",
     fontSize: 12,
   },
   title: {
     color: "#fff",
-    fontSize: 40,
+    fontSize: 35,
     fontWeight: "bold",
     marginBottom: 50,
     textAlign: "center",
@@ -100,12 +70,6 @@ const styles = StyleSheet.create({
     padding: 25,
     marginBottom: 12,
     color: "#fff",
-  },
-
-  forgotPassword: {
-    color: "#aaa",
-    fontSize: 15,
-    marginBottom: 13,
   },
 
   button: {

@@ -8,7 +8,7 @@ export default function HomeScreen() {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => router.push("/(main)/replenishments")}
+        onPress={() => router.push("/(replenishments)/home")}
       >
         <Text style={styles.buttonText}>REPOSIÇÕES</Text>
       </TouchableOpacity>
@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
+    backgroundColor: '#1c1c1c',
   },
   title: {
     color: '#fff',

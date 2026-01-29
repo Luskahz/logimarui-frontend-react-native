@@ -1,49 +1,45 @@
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Stack, router, usePathname } from 'expo-router';
+import { HomeIcon } from '@/components/icons/HomeIcon';
+import { ProfileIcon } from '@/components/icons/ProfileIcon';
 
 export default function MainLayout() {
   const pathname = usePathname();
 
+  const isHomeActive = pathname === '/home';
+  const isProfileActive = pathname === '/profile';
+
   return (
     <View style={styles.container}>
-      {/* Conteúdo da tela */}
       <View style={styles.content}>
         <Stack screenOptions={{ headerShown: false }} />
       </View>
 
-      {/* Footer */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.footerButton}
-          onPress={() => router.replace('/home')}
+          onPress={() => router.push('/home')}
         >
-          <Text
-            style={[
-              styles.footerIcon,
-              pathname.includes('home') && styles.active,
-            ]}
-          >
-            🏠
-          </Text>
+          <HomeIcon
+            color={isHomeActive ? '#f4a100' : '#777'}
+            size={24}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.footerButton}
-          onPress={() => router.replace('/profile')}
+          onPress={() => router.push('/profile')}
         >
-          <Text
-            style={[
-              styles.footerIcon,
-              pathname.includes('profile') && styles.active,
-            ]}
-          >
-            👤
-          </Text>
+          <ProfileIcon
+            color={isProfileActive ? '#f4a100' : '#777'}
+            size={24}
+          />
         </TouchableOpacity>
       </View>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -62,12 +58,5 @@ const styles = StyleSheet.create({
   },
   footerButton: {
     alignItems: 'center',
-  },
-  footerIcon: {
-    fontSize: 22,
-    color: '#777',
-  },
-  active: {
-    color: '#f4a100',
   },
 });
